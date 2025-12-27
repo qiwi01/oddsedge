@@ -166,7 +166,14 @@ const Outcomes = () => {
       <div className="predictions-container">
         <div className="predictions-loading">
           <div className="predictions-loading-spinner"></div>
-          <p>Loading outcomes...</p>
+          <div className="predictions-loading-text">
+            <div className="predictions-loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            Analyzing match outcomes...
+          </div>
         </div>
       </div>
     );

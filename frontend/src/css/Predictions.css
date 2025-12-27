@@ -1064,23 +1064,25 @@
 @media (max-width: 640px) {
   .predictions-container {
     padding: var(--space-2) var(--space-1);
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
   .predictions-header {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-2);
   }
 
   .predictions-title {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
   }
 
   .predictions-subtitle {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
   }
 
   .predictions-filters {
     gap: var(--space-1);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-2);
   }
 
   .predictions-filter-btn {
@@ -1089,27 +1091,33 @@
   }
 
   .predictions-match-card {
-    padding: var(--space-2);
+    padding: var(--space-1);
+    min-height: auto;
+    max-height: 160px;
   }
 
   .predictions-match-content {
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   .predictions-match-header {
-    margin-bottom: var(--space-1);
+    margin-bottom: 2px;
   }
 
   .predictions-match-teams {
-    margin-bottom: var(--space-1);
+    margin-bottom: 2px;
   }
 
   .predictions-match-teams-title {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
+  }
+
+  .predictions-match-league {
+    font-size: var(--font-size-xs);
   }
 
   .predictions-odds-section {
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
   }
 
   .predictions-prediction-section {
@@ -1117,27 +1125,37 @@
   }
 
   .predictions-prediction-display {
-    margin-bottom: var(--space-1);
+    margin-bottom: 2px;
   }
 
   .predictions-prediction-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 2px;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
+  }
+
+  .predictions-single-prediction {
+    min-width: 80px;
+    max-width: 120px;
+    padding: var(--space-1);
   }
 
   .predictions-prediction-btn {
     padding: var(--space-1);
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .predictions-prediction-btn-label {
-    font-size: 10px;
-    margin-bottom: 2px;
+    font-size: 9px;
+    margin-bottom: 1px;
   }
 
   .predictions-prediction-btn-confidence {
-    font-size: var(--font-size-xs);
+    display: none;
+  }
+
+  .predictions-prediction-confidence {
+    display: none;
   }
 
   .predictions-modal {
@@ -1146,22 +1164,30 @@
   }
 
   .predictions-stats {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
-    margin-bottom: var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
   }
 
   .predictions-stat-card {
-    padding: var(--space-3);
+    padding: var(--space-2);
   }
 
   .predictions-stat-value {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
   }
 
   .predictions-stat-icon-svg {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .predictions-outcome-item {
+    padding: var(--space-2);
+  }
+
+  .predictions-outcomes-list {
+    gap: var(--space-1);
   }
 }
 

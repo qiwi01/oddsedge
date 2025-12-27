@@ -1224,43 +1224,54 @@
   }
 
   .admin-match-card {
-    padding: var(--space-2);
+    padding: var(--space-1);
+    max-height: 160px;
+    overflow: hidden;
   }
 
   .admin-match-header {
     flex-direction: column;
-    gap: var(--space-1);
+    gap: 2px;
     align-items: flex-start;
-    margin-bottom: var(--space-2);
+    margin-bottom: 2px;
   }
 
   .admin-match-meta {
     flex-direction: row;
-    gap: var(--space-3);
+    gap: var(--space-2);
     align-items: center;
     font-size: var(--font-size-xs);
   }
 
   .admin-match-teams {
-    margin-bottom: var(--space-1);
-    font-size: var(--font-size-base);
+    margin-bottom: 2px;
+    font-size: var(--font-size-sm);
+  }
+
+  .admin-match-teams-title {
+    font-size: var(--font-size-sm);
   }
 
   .admin-predictions-list {
-    gap: var(--space-1);
+    gap: 2px;
   }
 
   .admin-prediction-item-display {
-    padding: var(--space-1);
+    padding: 2px;
     flex-direction: row;
-    gap: var(--space-1);
+    gap: 2px;
     align-items: center;
     justify-content: space-between;
   }
 
   .admin-prediction-type {
-    min-width: 80px;
+    min-width: 70px;
     width: auto;
+  }
+
+  .admin-prediction-type-label {
+    font-size: 9px;
+    padding: 1px var(--space-1);
   }
 
   .admin-prediction-details {
@@ -1268,10 +1279,23 @@
     text-align: center;
   }
 
+  .admin-prediction-value {
+    font-size: var(--font-size-sm);
+  }
+
+  .admin-prediction-confidence {
+    display: none;
+  }
+
   .admin-prediction-odds-display {
-    font-size: var(--font-size-xs);
-    min-width: 60px;
+    font-size: 9px;
+    min-width: 50px;
     text-align: right;
+  }
+
+  .admin-value-badge-small {
+    font-size: 8px;
+    padding: 1px var(--space-1);
   }
 }
 

@@ -1,0 +1,385 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../App';
+import { TrendingUp, Target, Users, Zap, Star, Calendar } from 'lucide-react';
+import api from '../utils/api';
+import '../css/Home.css';
+
+const Home = () => {
+  const [featuredMatches, setFeaturedMatches] = useState([]);
+  const [todaysMatches, setTodaysMatches] = useState([]);
+  const [outcomes, setOutcomes] = useState([]);
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Only load data if user is authenticated
+    if (!user) {
+      return;
+    }
+
+    // Get real matches from TheSportsDB
+    api.get('/api/matches')
+      .then(res => {
+        setFeaturedMatches(res.data.slice(0, 6));
+        // Filter for today's matches
+        const today = new Date().toDateString();
+        const todayMatches = res.data.filter(match =>
+          new Date(match.utcDate).toDateString() === today
+        );
+        setTodaysMatches(todayMatches);
+      })
+      .catch(err => {
+        // Handle 401 (unauthorized) gracefully - don't show error
+        if (err.response?.status !== 401) {
+          // Could add fallback logic here if needed
+        }
+      });
+
+    // Get outcomes (past predictions)
+    api.get('/api/outcomes?days=7')
+      .then(res => setOutcomes(res.data))
+      .catch(err => {
+        // Handle 401 (unauthorized) gracefully - don't show error
+        if (err.response?.status !== 401) {
+          // Could add fallback logic here if needed
+        }
+      });
+
+  }, [user]);
+
+  return (
+    <div className="home-container">
+      {/* Hero Section */}
+      <section className="home-hero">
+        <div className="home-hero-content">
+          <h1 className="home-title">
+            OddsEdge
+          </h1>
+
+          <p className="home-subtitle">
+            Professional Football Prediction Platform
+          </p>
+
+          <p className="home-description">
+            Powered by advanced AI algorithms using Poisson distribution, statistical modeling,
+            and real-time bookmaker odds to deliver the most accurate predictions in football betting.
+          </p>
+
+          <div className="home-cta-buttons">
+            <Link to="/predictions" className="home-cta-primary">
+              <span className="home-cta-content">
+                <span>View All Matches & Predictions</span>
+                <TrendingUp className="home-cta-icon" />
+              </span>
+            </Link>
+            {!user && (
+              <Link to="/register" className="home-cta-secondary">
+                Join Free
+              </Link>
+            )}
+          </div>
+
+          {/* Stats Bar */}
+          <div className="home-stats-bar">
+            <div className="home-stat-item">
+              <div className="home-stat-number">95%</div>
+              <div className="home-stat-label">Prediction Accuracy</div>
+            </div>
+            <div className="home-stat-item">
+              <div className="home-stat-number">24/7</div>
+              <div className="home-stat-label">Live Updates</div>
+            </div>
+            <div className="home-stat-item">
+              <div className="home-stat-number">50K+</div>
+              <div className="home-stat-label">Active Users</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+      {/* Features Section - Only show for logged-out users */}
+      {!user && (
+        <section className="home-features">
+          <div className="home-feature-card">
+            <div className="home-feature-icon">
+              <Target className="home-feature-icon-svg" />
+            </div>
+            <h3 className="home-feature-title">Poisson Distribution</h3>
+            <p className="home-feature-description">
+              Advanced mathematical modeling for accurate goal probability calculations
+            </p>
+          </div>
+          <div className="home-feature-card">
+            <div className="home-feature-icon">
+              <TrendingUp className="home-feature-icon-svg" />
+            </div>
+            <h3 className="home-feature-title">Home Advantage</h3>
+            <p className="home-feature-description">
+              Statistical analysis of home/away performance and venue factors
+            </p>
+          </div>
+          <div className="home-feature-card">
+            <div className="home-feature-icon">
+              <Zap className="home-feature-icon-svg" />
+            </div>
+            <h3 className="home-feature-title">Value Detection</h3>
+            <p className="home-feature-description">
+              Identify overvalued odds and find profitable betting opportunities
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Today's Predictions Section */}
+      <section className="home-matches-section">
+        <div className="home-matches-header">
+          <h2 className="home-matches-title">Today's Predictions</h2>
+          <Link to="/predictions?filter=today" className="home-view-all">
+            View All →
+          </Link>
+        </div>
+
+        {!Array.isArray(todaysMatches) || todaysMatches.length === 0 ? (
+          <div className="home-empty-state">
+            <div className="home-empty-icon">⚽</div>
+            <h3 className="home-empty-title">No matches today</h3>
+            <p className="home-empty-description">Check back tomorrow for today's predictions</p>
+          </div>
+        ) : (
+          <div className="home-matches-grid">
+            {todaysMatches.slice(0, 3).map((match, index) => (
+              <div
+                key={index}
+                className={`admin-match-card ${match.valueBet ? 'admin-match-value' : ''}`}
+              >
+                <div className="admin-match-header">
+                  <div className="admin-match-meta">
+                    <div className="admin-match-meta-item">
+                      <Calendar className="admin-match-icon" />
+                      <span>{new Date(match.utcDate).toLocaleDateString()}</span>
+                    </div>
+                    <div className="admin-match-meta-item">
+                      <span>{match.predictions?.length || 0} prediction{match.predictions?.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+
+                  {match.valueBet && (
+                    <div className="admin-value-badge-small">
+                      <Star className="admin-value-icon-small" />
+                      <span>VALUE</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="admin-match-info">
+                  <h3 className="admin-match-teams">
+                    {match.homeTeam.name} vs {match.awayTeam.name}
+                  </h3>
+                  <p className="admin-match-league">{match.competition?.name || 'Premier League'}</p>
+                </div>
+
+                <div className="admin-predictions-list">
+                  {match.predictions && match.predictions.length > 0 ? (
+                    match.predictions.map((pred, predIndex) => (
+                      <div key={predIndex} className={`admin-prediction-item-display ${pred.valueBet ? 'admin-match-value' : ''}`}>
+                        <div className="admin-prediction-type">
+                        <span className="admin-prediction-type-label">
+                          {pred.type === 'win' ? 'WIN/DRAW' :
+                           pred.type === 'over15' ? 'OVER/UNDER 1.5' :
+                           pred.type === 'over25' ? 'OVER/UNDER 2.5' :
+                           'PLAYER'}
+                        </span>
+                          {pred.valueBet && (
+                            <div className="admin-value-badge-small">
+                              <Star className="admin-value-icon-small" />
+                              <span>VALUE</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="admin-prediction-details">
+                          <div className="admin-prediction-value">{pred.prediction}</div>
+                          <div className="admin-prediction-confidence">{pred.confidence}% confidence</div>
+                        </div>
+
+                        {pred.odds && (
+                          <div className="admin-prediction-odds-display">
+                            {pred.type === 'win' && (
+                              <span>{pred.odds.home || '-'} | {pred.odds.draw || '-'} | {pred.odds.away || '-'}</span>
+                            )}
+                            {(pred.type === 'over15' || pred.type === 'over25') && (
+                              <span>O: {pred.odds.over || '-'} | U: {pred.odds.under || '-'}</span>
+                            )}
+                            {pred.type === 'player' && (
+                              <span>{pred.odds.home || '-'}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="admin-no-predictions">
+                      <span>No predictions available</span>
+                    </div>
+                  )}
+                </div>
+
+
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Outcomes Section */}
+      <section className="home-matches-section">
+        <div className="home-matches-header">
+          <h2 className="home-matches-title">Recent Outcomes</h2>
+          <Link to="/outcomes" className="home-view-all">
+            View All →
+          </Link>
+        </div>
+
+        {!outcomes || !outcomes.all || outcomes.all.length === 0 ? (
+          <div className="home-empty-state">
+            <div className="home-empty-icon">📊</div>
+            <h3 className="home-empty-title">No recent outcomes</h3>
+            <p className="home-empty-description">Outcomes will appear here after matches are completed</p>
+          </div>
+        ) : (
+          <div className="home-matches-grid">
+            {outcomes.all.slice(0, 3).map((outcome, index) => (
+              <div key={index} className="home-match-card">
+                <div className="home-match-header">
+                  <div className="home-match-meta">
+                    <div className="home-match-meta-item">
+                      <Calendar className="home-match-icon" />
+                      <span>{new Date(outcome.utcDate).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+
+                  <div className={`home-outcome-badge ${outcome.actualResult === outcome.prediction ? 'correct' : 'incorrect'}`}>
+                    {outcome.actualResult === outcome.prediction ? '✅ Correct' : '❌ Incorrect'}
+                  </div>
+                </div>
+
+                <div className="home-match-info">
+                  <h3 className="home-match-teams">
+                    {outcome.homeTeam.name} vs {outcome.awayTeam.name}
+                  </h3>
+                  <p className="home-match-league">{outcome.competition?.name || 'Premier League'}</p>
+                </div>
+
+                <div className="home-prediction-section">
+                  <div className="home-prediction-display">
+                    <div className="home-prediction-label">Predicted: {outcome.prediction}</div>
+                    <div className="home-prediction-label">Actual: {outcome.actualResult}</div>
+                    <div className="home-prediction-confidence">{outcome.confidence}% Confidence</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Featured Matches */}
+      <section className="home-matches-section">
+        <div className="home-matches-header">
+          <h2 className="home-matches-title">Featured Predictions</h2>
+          <Link to="/predictions" className="home-view-all">
+            View All →
+          </Link>
+        </div>
+
+        <div className="home-matches-grid">
+          {Array.isArray(featuredMatches) && featuredMatches.map((match, index) => (
+            <div
+              key={index}
+              className={`admin-match-card ${match.valueBet ? 'admin-match-value' : ''}`}
+            >
+              <div className="admin-match-header">
+                <div className="admin-match-meta">
+                  <div className="admin-match-meta-item">
+                    <Calendar className="admin-match-icon" />
+                    <span>{new Date(match.utcDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="admin-match-meta-item">
+                    <span>{match.predictions?.length || 0} prediction{match.predictions?.length !== 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+
+                {match.valueBet && (
+                  <div className="admin-value-badge-small">
+                    <Star className="admin-value-icon-small" />
+                    <span>VALUE</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="admin-match-info">
+                <h3 className="admin-match-teams">
+                  {match.homeTeam.name} vs {match.awayTeam.name}
+                </h3>
+                <p className="admin-match-league">{match.competition?.name || 'Premier League'}</p>
+              </div>
+
+              <div className="admin-predictions-list">
+                {match.predictions && match.predictions.length > 0 ? (
+                  match.predictions.map((pred, predIndex) => (
+                    <div key={predIndex} className={`admin-prediction-item-display ${pred.valueBet ? 'admin-match-value' : ''}`}>
+                      <div className="admin-prediction-type">
+                        <span className="admin-prediction-type-label">
+                          {pred.type === 'win' ? 'WIN/DRAW' :
+                           pred.type === 'over15' ? 'OVER/UNDER 1.5' :
+                           pred.type === 'over25' ? 'OVER/UNDER 2.5' :
+                           'PLAYER'}
+                        </span>
+                        {pred.valueBet && (
+                          <div className="admin-value-badge-small">
+                            <Star className="admin-value-icon-small" />
+                            <span>VALUE</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="admin-prediction-details">
+                        <div className="admin-prediction-value">{pred.prediction}</div>
+                        <div className="admin-prediction-confidence">{pred.confidence}% confidence</div>
+                      </div>
+
+                      {pred.odds && (
+                        <div className="admin-prediction-odds-display">
+                          {pred.type === 'win' && (
+                            <span>{pred.odds.home || '-'} | {pred.odds.draw || '-'} | {pred.odds.away || '-'}</span>
+                          )}
+                          {(pred.type === 'over15' || pred.type === 'over25') && (
+                            <span>O: {pred.odds.over || '-'} | U: {pred.odds.under || '-'}</span>
+                          )}
+                          {pred.type === 'player' && (
+                            <span>{pred.odds.home || '-'}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="admin-no-predictions">
+                    <span>No predictions available</span>
+                  </div>
+                )}
+              </div>
+
+
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;

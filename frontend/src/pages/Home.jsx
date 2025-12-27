@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
-import { TrendingUp, Target, Users, Zap, Star, Calendar } from 'lucide-react';
+import { TrendingUp, Target, Users, Zap, Star, Calendar, ArrowRight, Shuffle, Crown, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../utils/api';
 import '../css/Home.css';
 
@@ -9,6 +10,16 @@ const Home = () => {
   const [featuredMatches, setFeaturedMatches] = useState([]);
   const [todaysMatches, setTodaysMatches] = useState([]);
   const [outcomes, setOutcomes] = useState([]);
+
+  // Mini converter states
+  const [converterForm, setConverterForm] = useState({
+    fromBookmaker: 'bet9ja',
+    toBookmaker: 'sportybet',
+    bookingCode: ''
+  });
+  const [converterResult, setConverterResult] = useState(null);
+  const [converterError, setConverterError] = useState('');
+  const [converting, setConverting] = useState(false);
 
   const { user } = useAuth();
 
@@ -47,6 +58,51 @@ const Home = () => {
       });
 
   }, [user]);
+
+  // Mini converter functions
+  const handleConverterInputChange = (field, value) => {
+    setConverterForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    setConverterError('');
+    setConverterResult(null);
+  };
+
+  const handleMiniConvert = async (e) => {
+    e.preventDefault();
+
+    if (!converterForm.bookingCode.trim()) {
+      toast.error('Please enter a booking code');
+      return;
+    }
+
+    setConverting(true);
+    setConverterError('');
+
+    try {
+      const response = await api.post('/api/vip/convert-booking-code', {
+        fromBookmaker: converterForm.fromBookmaker,
+        toBookmaker: converterForm.toBookmaker,
+        bookingCode: converterForm.bookingCode.trim()
+      });
+
+      if (response.data.success) {
+        setConverterResult(response.data.data);
+        toast.success('Code converted successfully!');
+      }
+    } catch (error) {
+      if (error.response?.status === 403) {
+        setConverterError('VIP membership required to use the bet converter. Upgrade now to access this premium feature!');
+      } else {
+        const errorMessage = error.response?.data?.error || 'Conversion failed';
+        setConverterError(errorMessage);
+        toast.error(errorMessage);
+      }
+    } finally {
+      setConverting(false);
+    }
+  };
 
   return (
     <div className="home-container">
@@ -98,7 +154,92 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Mini Bet Converter - Show for logged-in users */}
+      {user && (
+        <section className="home-converter-section">
+          <div className="home-converter-container">
+            <div className="home-converter-header">
+              <h2 className="home-converter-title">
+                <Shuffle className="home-converter-icon" />
+                Quick Bet Converter
+              </h2>
+              <p className="home-converter-subtitle">
+                Convert booking codes between sportsbooks instantly
+              </p>
+            </div>
 
+            <div className="home-mini-converter">
+              <form onSubmit={handleMiniConvert} className="mini-converter-form">
+                <div className="mini-converter-inputs">
+                  <select
+                    value={converterForm.fromBookmaker}
+                    onChange={(e) => handleConverterInputChange('fromBookmaker', e.target.value)}
+                    className="mini-converter-select"
+                  >
+                    <option value="bet9ja">Bet9ja</option>
+                    <option value="sportybet">SportyBet</option>
+                    <option value="betking">BetKing</option>
+                    <option value="nairabet">NairaBet</option>
+                  </select>
+
+                  <ArrowRight className="mini-converter-arrow" />
+
+                  <select
+                    value={converterForm.toBookmaker}
+                    onChange={(e) => handleConverterInputChange('toBookmaker', e.target.value)}
+                    className="mini-converter-select"
+                  >
+                    <option value="bet9ja">Bet9ja</option>
+                    <option value="sportybet">SportyBet</option>
+                    <option value="betking">BetKing</option>
+                    <option value="nairabet">NairaBet</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    value={converterForm.bookingCode}
+                    onChange={(e) => handleConverterInputChange('bookingCode', e.target.value.toUpperCase())}
+                    placeholder="Enter code"
+                    className="mini-converter-code"
+                    required
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={converting}
+                    className="mini-converter-btn"
+                  >
+                    {converting ? (
+                      <div className="mini-spinner"></div>
+                    ) : (
+                      <Shuffle className="mini-btn-icon" />
+                    )}
+                  </button>
+                </div>
+
+                {converterError && (
+                  <div className="mini-converter-error">
+                    <AlertCircle className="error-icon" />
+                    <span>{converterError}</span>
+                    <Link to="/vip" className="error-upgrade-link">
+                      Upgrade to VIP
+                    </Link>
+                  </div>
+                )}
+
+                {converterResult && (
+                  <div className="mini-converter-result">
+                    <div className="result-code" onClick={() => {navigator.clipboard.writeText(converterResult.convertedCode); toast.success('Copied!');}}>
+                      {converterResult.convertedCode}
+                    </div>
+                    <Crown className="result-vip-icon" />
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section - Only show for logged-out users */}
       {!user && (

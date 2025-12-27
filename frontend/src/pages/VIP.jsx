@@ -111,10 +111,10 @@ const VIP = () => {
             <Star className="vip-action-icon" />
             View VIP Predictions
           </a>
-          <button className="vip-action-btn secondary">
+          <a href="/vip/converter" className="vip-action-btn secondary">
             <TrendingUp className="vip-action-icon" />
             Bet Code Converter
-          </button>
+          </a>
         </div>
       </div>
     );

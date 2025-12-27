@@ -198,4 +198,167 @@ router.put('/toggle-vip/:userId', authenticateToken, requireAdmin, async (req, r
   }
 });
 
+// Bet Converter - VIP Only
+router.post('/convert-booking-code', authenticateToken, async (req, res) => {
+  try {
+    // Check if user is VIP
+    const user = await User.findById(req.user.id).select('isVIP vipExpiry');
+    if (!user.isVIP || (user.vipExpiry && user.vipExpiry < new Date())) {
+      return res.status(403).json({
+        success: false,
+        error: 'VIP access required for bet converter'
+      });
+    }
+
+    const { fromBookmaker, toBookmaker, bookingCode } = req.body;
+
+    if (!fromBookmaker || !toBookmaker || !bookingCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: fromBookmaker, toBookmaker, bookingCode'
+      });
+    }
+
+    // Simple bet code conversion logic
+    // This is a basic implementation - in production you'd want more comprehensive mapping
+    const convertedCode = await convertBettingCode(fromBookmaker, toBookmaker, bookingCode);
+
+    if (!convertedCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'Unable to convert booking code. Please check the code format.'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        originalCode: bookingCode,
+        fromBookmaker,
+        toBookmaker,
+        convertedCode,
+        convertedAt: new Date()
+      }
+    });
+  } catch (error) {
+    console.error('Bet converter error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Bet conversion failed'
+    });
+  }
+});
+
+// Get available bookmakers for conversion
+router.get('/bookmakers', authenticateToken, async (req, res) => {
+  try {
+    // Check if user is VIP
+    const user = await User.findById(req.user.id).select('isVIP vipExpiry');
+    if (!user.isVIP || (user.vipExpiry && user.vipExpiry < new Date())) {
+      return res.status(403).json({
+        success: false,
+        error: 'VIP access required'
+      });
+    }
+
+    const bookmakers = [
+      { id: 'bet9ja', name: 'Bet9ja', country: 'Nigeria' },
+      { id: 'sportybet', name: 'SportyBet', country: 'Nigeria' },
+      { id: 'betking', name: 'BetKing', country: 'Nigeria' },
+      { id: 'nairabet', name: 'NairaBet', country: 'Nigeria' },
+      { id: 'merrybet', name: 'MerryBet', country: 'Nigeria' },
+      { id: 'bet365', name: 'Bet365', country: 'International' },
+      { id: '1xbet', name: '1xBet', country: 'International' },
+      { id: 'betway', name: 'Betway', country: 'International' },
+      { id: 'pinnacle', name: 'Pinnacle', country: 'International' }
+    ];
+
+    res.json({
+      success: true,
+      data: bookmakers
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get bookmakers'
+    });
+  }
+});
+
 module.exports = router;
+
+// Helper function for bet code conversion
+async function convertBettingCode(fromBookmaker, toBookmaker, code) {
+  // This is a simplified conversion logic
+  // In a real implementation, you'd have comprehensive mapping tables
+  // or integrate with third-party conversion services
+
+  const conversionMap = {
+    'bet9ja': {
+      'sportybet': (code) => {
+        // Example conversion logic - replace specific patterns
+        return code.replace(/B9J/g, 'SB').replace(/^9/, 'S');
+      },
+      'betking': (code) => {
+        return code.replace(/B9J/g, 'BK').replace(/^9/, 'K');
+      },
+      'bet365': (code) => {
+        // Convert to Bet365 format (typically longer alphanumeric)
+        return 'B365' + code.substring(1);
+      }
+    },
+    'sportybet': {
+      'bet9ja': (code) => {
+        return code.replace(/SB/g, 'B9J').replace(/^S/, '9');
+      },
+      'betking': (code) => {
+        return code.replace(/SB/g, 'BK').replace(/^S/, 'K');
+      },
+      'bet365': (code) => {
+        return 'B365' + code.substring(1);
+      }
+    },
+    'betking': {
+      'bet9ja': (code) => {
+        return code.replace(/BK/g, 'B9J').replace(/^K/, '9');
+      },
+      'sportybet': (code) => {
+        return code.replace(/BK/g, 'SB').replace(/^K/, 'S');
+      },
+      'bet365': (code) => {
+        return 'B365' + code.substring(1);
+      }
+    },
+    'bet365': {
+      'bet9ja': (code) => {
+        if (code.startsWith('B365')) {
+          return '9' + code.substring(4);
+        }
+        return code;
+      },
+      'sportybet': (code) => {
+        if (code.startsWith('B365')) {
+          return 'S' + code.substring(4);
+        }
+        return code;
+      },
+      'betking': (code) => {
+        if (code.startsWith('B365')) {
+          return 'K' + code.substring(4);
+        }
+        return code;
+      }
+    }
+  };
+
+  // Normalize bookmaker names
+  const from = fromBookmaker.toLowerCase();
+  const to = toBookmaker.toLowerCase();
+
+  if (conversionMap[from] && conversionMap[from][to]) {
+    return conversionMap[from][to](code);
+  }
+
+  // If no specific conversion exists, return original code with a note
+  return code + '_CONVERTED';
+}

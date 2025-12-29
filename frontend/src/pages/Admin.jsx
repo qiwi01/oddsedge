@@ -678,21 +678,7 @@ const Admin = () => {
                     className="admin-form-input"
                   />
                 </div>
-                <div className="admin-form-group">
-                  <label className="admin-form-label">VIP Only</label>
-                  <div className="admin-checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="vip-only"
-                      checked={newGame.isVIP || false}
-                      onChange={(e) => setNewGame({ ...newGame, isVIP: e.target.checked })}
-                      className="admin-checkbox"
-                    />
-                    <label htmlFor="vip-only" className="admin-checkbox-label">
-                      Make this game VIP-only
-                    </label>
-                  </div>
-                </div>
+                {/* VIP checkbox removed from match level - now per prediction */}
               </div>
 
               {/* Predictions */}
@@ -804,19 +790,23 @@ const Admin = () => {
                       </div>
 
                       <div className="admin-form-group">
-                        <label className="admin-form-label">Value Bet</label>
-                        <select
-                          value={pred.valueBet ? 'yes' : 'no'}
-                          onChange={(e) => {
-                            const updatedPredictions = [...newGame.predictions];
-                            updatedPredictions[index] = { ...pred, valueBet: e.target.value === 'yes' };
-                            setNewGame({ ...newGame, predictions: updatedPredictions });
-                          }}
-                          className="admin-form-select"
-                        >
-                          <option value="no">No</option>
-                          <option value="yes">Yes</option>
-                        </select>
+                        <label className="admin-form-label">VIP Only</label>
+                        <div className="admin-checkbox-group">
+                          <input
+                            type="checkbox"
+                            id={`vip-pred-${index}`}
+                            checked={pred.isVIP || false}
+                            onChange={(e) => {
+                              const updatedPredictions = [...newGame.predictions];
+                              updatedPredictions[index] = { ...pred, isVIP: e.target.checked };
+                              setNewGame({ ...newGame, predictions: updatedPredictions });
+                            }}
+                            className="admin-checkbox"
+                          />
+                          <label htmlFor={`vip-pred-${index}`} className="admin-checkbox-label">
+                            VIP users only
+                          </label>
+                        </div>
                       </div>
                     </div>
 
@@ -1005,7 +995,9 @@ const Admin = () => {
               </div>
             ) : (
               <div className="admin-games-list">
-                {games.map((game, index) => (
+                {games
+                  .sort((a, b) => new Date(b.createdAt || b.utcDate) - new Date(a.createdAt || a.utcDate))
+                  .map((game, index) => (
                   <div key={game.id || index} className="admin-match-card">
                     <div className="admin-match-header">
                       <div className="admin-match-meta">
@@ -1258,8 +1250,38 @@ const Admin = () => {
                 </div>
               </div>
             ) : (
-              <div className="admin-matches-outcomes">
-                {games.slice(0, 10).map((game, index) => (
+                <div className="admin-matches-outcomes">
+                  {(() => {
+                    // Separate games into selected (those with marked predictions) and unselected
+                    const selectedGames = [];
+                    const unselectedGames = [];
+
+                    games.slice(0, 10).forEach((game) => {
+                      const hasMarkedPredictions = game.predictions && game.predictions.some(pred =>
+                        game.outcomes && game.outcomes.some(outcome =>
+                          outcome.predictionType === pred.type && outcome.prediction === pred.prediction
+                        )
+                      );
+
+                      if (hasMarkedPredictions) {
+                        selectedGames.push(game);
+                      } else {
+                        unselectedGames.push(game);
+                      }
+                    });
+
+                    // Sort selected games by most recently marked (newest first)
+                    selectedGames.sort((a, b) => {
+                      const aLatestOutcome = a.outcomes && a.outcomes.length > 0 ?
+                        new Date(a.outcomes[a.outcomes.length - 1].createdAt || a.outcomes[a.outcomes.length - 1].updatedAt) : new Date(0);
+                      const bLatestOutcome = b.outcomes && b.outcomes.length > 0 ?
+                        new Date(b.outcomes[b.outcomes.length - 1].createdAt || b.outcomes[b.outcomes.length - 1].updatedAt) : new Date(0);
+                      return bLatestOutcome - aLatestOutcome;
+                    });
+
+                    // Combine unselected first, then selected
+                    return [...unselectedGames, ...selectedGames];
+                  })().map((game, index) => (
                   <div key={game.id || index} className="admin-match-card">
                     <div className="admin-match-outcome-header">
                       <div className="admin-match-outcome-teams">

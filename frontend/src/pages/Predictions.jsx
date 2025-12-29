@@ -10,6 +10,7 @@ const Predictions = () => {
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLeague, setSelectedLeague] = useState('all');
+  const [selectedDate, setSelectedDate] = useState('');
   const location = useLocation();
 
   // Determine prediction type from URL
@@ -60,15 +61,30 @@ const Predictions = () => {
   }, [predictionType]);
 
   useEffect(() => {
-    // Filter matches by selected league
-    if (selectedLeague === 'all') {
-      setFilteredMatches(matches);
-    } else {
-      setFilteredMatches(matches.filter(match =>
+    let filtered = matches;
+
+    // Filter by league
+    if (selectedLeague !== 'all') {
+      filtered = filtered.filter(match =>
         match.competition?.name === selectedLeague || match.league === selectedLeague
-      ));
+      );
     }
-  }, [matches, selectedLeague]);
+
+    // Filter by date
+    if (selectedDate) {
+      const filterDate = new Date(selectedDate);
+      filterDate.setHours(0, 0, 0, 0);
+      const nextDay = new Date(filterDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      filtered = filtered.filter(match => {
+        const matchDate = new Date(match.utcDate);
+        return matchDate >= filterDate && matchDate < nextDay;
+      });
+    }
+
+    setFilteredMatches(filtered);
+  }, [matches, selectedLeague, selectedDate]);
 
   // Get unique leagues from matches
   const getAvailableLeagues = () => {
@@ -273,7 +289,7 @@ const Predictions = () => {
         </p>
       </div>
 
-      {/* League Filter */}
+      {/* League and Date Filters */}
       <div className="predictions-filters">
         <select
           value={selectedLeague}
@@ -285,6 +301,14 @@ const Predictions = () => {
             <option key={league} value={league}>{league}</option>
           ))}
         </select>
+
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="predictions-date-select"
+          placeholder="Filter by date"
+        />
       </div>
 
       {/* Matches Grid */}

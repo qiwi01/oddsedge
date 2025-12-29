@@ -116,6 +116,41 @@
   color: var(--gray-100);
 }
 
+/* Date Select */
+.predictions-date-select {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--gray-300);
+  background: var(--gray-50);
+  color: var(--gray-900);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  transition: var(--transition-all);
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.dark .predictions-date-select {
+  background: var(--gray-900);
+  border-color: var(--gray-700);
+  color: var(--gray-100);
+}
+
+.predictions-date-select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.dark .predictions-date-select:focus {
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px var(--primary-900);
+}
+
+.predictions-date-select:hover {
+  border-color: var(--primary-300);
+}
+
 .predictions-filter-btn:not(.active) {
   background: var(--gray-100);
   color: var(--gray-900);

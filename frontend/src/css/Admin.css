@@ -1224,7 +1224,9 @@
   }
 
   .admin-match-card {
-    padding: var(--space-1);
+    padding: var(--space-3);
+    min-height: 200px;
+    height: auto;
     max-height: 160px;
     overflow: hidden;
   }

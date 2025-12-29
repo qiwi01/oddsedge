@@ -146,6 +146,21 @@ function AppContent() {
                 <Predictions />
               </ProtectedRoute>
             } />
+            <Route path="/predictions/top-picks/corners" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/top-picks/ggng" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/top-picks/others" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
             <Route path="/predictions/top-picks/players" element={
               <ProtectedRoute>
                 <Predictions />
@@ -180,6 +195,21 @@ function AppContent() {
                 <Predictions />
               </ProtectedRoute>
             } />
+            <Route path="/predictions/today/corners" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/today/ggng" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/today/others" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
             <Route path="/predictions/today/players" element={
               <ProtectedRoute>
                 <Predictions />
@@ -207,6 +237,27 @@ function AppContent() {
                 <Predictions />
               </ProtectedRoute>
             } />
+            <Route path="/predictions/corners" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/ggng" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/others" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions/player" element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } />
+            {/* Keep the old route for backward compatibility */}
             <Route path="/predictions/players" element={
               <ProtectedRoute>
                 <Predictions />

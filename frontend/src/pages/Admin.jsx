@@ -738,6 +738,9 @@ const Admin = () => {
                           <option value="win">Win</option>
                           <option value="over15">Over 1.5</option>
                           <option value="over25">Over 2.5</option>
+                          <option value="corners">Corners</option>
+                          <option value="ggng">GG/NG</option>
+                          <option value="others">Others</option>
                           <option value="player">Player</option>
                         </select>
                       </div>
@@ -1027,6 +1030,9 @@ const Admin = () => {
                                 {pred.type === 'win' ? 'WIN' :
                                  pred.type === 'over15' ? 'OVER 1.5' :
                                  pred.type === 'over25' ? 'OVER 2.5' :
+                                 pred.type === 'corners' ? 'CORNERS' :
+                                 pred.type === 'ggng' ? 'GG/NG' :
+                                 pred.type === 'others' ? 'OTHERS' :
                                  'PLAYER'}
                               </span>
                               {pred.valueBet && (
@@ -1427,6 +1433,9 @@ const Admin = () => {
                                         { value: 'win', label: 'Win' },
                                         { value: 'over15', label: 'Over 1.5' },
                                         { value: 'over25', label: 'Over 2.5' },
+                                        { value: 'corners', label: 'Corners' },
+                                        { value: 'ggng', label: 'GG/NG' },
+                                        { value: 'others', label: 'Others' },
                                         { value: 'player', label: 'Player' }
                                       ]
                                     },

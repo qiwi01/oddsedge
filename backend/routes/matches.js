@@ -105,7 +105,7 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
     if (predictions && predictions.length > 0) {
       for (const pred of predictions) {
         // Validate prediction
-        if (!pred.type || !['win', 'over15', 'over25', 'over35', 'player'].includes(pred.type)) {
+        if (!pred.type || !['win', 'over15', 'over25', 'over35', 'corners', 'ggng', 'others', 'player'].includes(pred.type)) {
           return res.status(400).json({ error: `Invalid prediction type: ${pred.type}` });
         }
         if (!pred.prediction || typeof pred.prediction !== 'string') {

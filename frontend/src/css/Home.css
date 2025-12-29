@@ -973,6 +973,25 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+/* ===== VIP BADGE ===== */
+.home-vip-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-vip-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 /* ===== MINI BET CONVERTER ===== */
 .home-converter-section {
   margin: var(--space-16) var(--space-8);

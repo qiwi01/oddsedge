@@ -197,9 +197,9 @@ const Outcomes = () => {
       {/* Date Navigation */}
       <div className="outcomes-date-nav">
         <button
-          onClick={() => navigateDate('prev')}
+          onClick={() => navigateDate('next')}
           className="outcomes-date-btn"
-          disabled={!availableDates.length || selectedDate === availableDates[0]}
+          disabled={!availableDates.length || selectedDate === availableDates[availableDates.length - 1]}
         >
           <ChevronLeft className="outcomes-date-icon" />
         </button>
@@ -210,9 +210,9 @@ const Outcomes = () => {
         </div>
 
         <button
-          onClick={() => navigateDate('next')}
+          onClick={() => navigateDate('prev')}
           className="outcomes-date-btn"
-          disabled={!availableDates.length || selectedDate === availableDates[availableDates.length - 1]}
+          disabled={!availableDates.length || selectedDate === availableDates[0]}
         >
           <ChevronRight className="outcomes-date-icon" />
         </button>
@@ -350,11 +350,14 @@ const Outcomes = () => {
                   {match.outcomes && match.outcomes.map((outcome, outcomeIndex) => (
                     <div key={outcomeIndex} className="predictions-outcome-item">
                       <div className="predictions-outcome-header">
-                        <span className="predictions-outcome-type">
+                            <span className="predictions-outcome-type">
                           {outcome.predictionType === 'win' ? 'Match Winner' :
                            outcome.predictionType === 'over15' ? 'Over/Under 1.5' :
                            outcome.predictionType === 'over25' ? 'Over/Under 2.5' :
                            outcome.predictionType === 'over35' ? 'Over/Under 3.5' :
+                           outcome.predictionType === 'corners' ? 'Corners' :
+                           outcome.predictionType === 'ggng' ? 'GG/NG' :
+                           outcome.predictionType === 'others' ? 'Others' :
                            'Player Prediction'}
                         </span>
 

@@ -180,6 +180,27 @@ const Navbar = () => {
                           <span>Over/Under 3.5</span>
                         </button>
                         <button
+                          onClick={() => handleProtectedNavigation("/predictions/today/corners")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">🎯</span>
+                          <span>Corners</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/today/ggng")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">⚽</span>
+                          <span>GG/NG</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/today/others")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">🎲</span>
+                          <span>Others</span>
+                        </button>
+                        <button
                           onClick={() => handleProtectedNavigation("/predictions/today/players")}
                           className="navbar-dropdown-item"
                         >
@@ -229,6 +250,27 @@ const Navbar = () => {
                           <span>Over/Under 3.5</span>
                         </button>
                         <button
+                          onClick={() => handleProtectedNavigation("/predictions/top-picks/corners")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">🎯</span>
+                          <span>Corners</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/top-picks/ggng")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">⚽</span>
+                          <span>GG/NG</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/top-picks/others")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">🎲</span>
+                          <span>Others</span>
+                        </button>
+                        <button
                           onClick={() => handleProtectedNavigation("/predictions/top-picks/players")}
                           className="navbar-dropdown-item"
                         >
@@ -276,6 +318,27 @@ const Navbar = () => {
                         >
                           <span className="navbar-dropdown-item-icon">⚽</span>
                           <span>Over/Under 3.5</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/corners")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">🎯</span>
+                          <span>Corners</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/ggng")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">⚽</span>
+                          <span>GG/NG</span>
+                        </button>
+                        <button
+                          onClick={() => handleProtectedNavigation("/predictions/others")}
+                          className="navbar-dropdown-item"
+                        >
+                          <span className="navbar-dropdown-item-icon">🎲</span>
+                          <span>Others</span>
                         </button>
                         <button
                           onClick={() => handleProtectedNavigation("/predictions/players")}
@@ -395,6 +458,15 @@ const Navbar = () => {
                   <button onClick={() => handleMobileNavigation("/predictions/today/over25")} className="navbar-mobile-submenu-item">
                     ⚽ Over 2.5
                   </button>
+                  <button onClick={() => handleMobileNavigation("/predictions/today/corners")} className="navbar-mobile-submenu-item">
+                    🎯 Corners
+                  </button>
+                  <button onClick={() => handleMobileNavigation("/predictions/today/ggng")} className="navbar-mobile-submenu-item">
+                    ⚽ GG/NG
+                  </button>
+                  <button onClick={() => handleMobileNavigation("/predictions/today/others")} className="navbar-mobile-submenu-item">
+                    🎲 Others
+                  </button>
                   <button onClick={() => handleMobileNavigation("/predictions/today/players")} className="navbar-mobile-submenu-item">
                     👥 Players
                   </button>
@@ -432,6 +504,15 @@ const Navbar = () => {
                   </button>
                   <button onClick={() => handleMobileNavigation("/predictions/over25")} className="navbar-mobile-submenu-item">
                     ⚽ Over 2.5
+                  </button>
+                  <button onClick={() => handleMobileNavigation("/predictions/corners")} className="navbar-mobile-submenu-item">
+                    🎯 Corners
+                  </button>
+                  <button onClick={() => handleMobileNavigation("/predictions/ggng")} className="navbar-mobile-submenu-item">
+                    ⚽ GG/NG
+                  </button>
+                  <button onClick={() => handleMobileNavigation("/predictions/others")} className="navbar-mobile-submenu-item">
+                    🎲 Others
                   </button>
                   <button onClick={() => handleMobileNavigation("/predictions/players")} className="navbar-mobile-submenu-item">
                     👥 Players

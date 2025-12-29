@@ -392,33 +392,61 @@ const Home = () => {
           </div>
         ) : (
           <div className="home-matches-grid">
-            {outcomes.all.slice(0, 3).map((outcome, index) => (
+            {outcomes.all.slice(0, 3).map((match, index) => (
               <div key={index} className="home-match-card">
                 <div className="home-match-header">
                   <div className="home-match-meta">
                     <div className="home-match-meta-item">
                       <Calendar className="home-match-icon" />
-                      <span>{new Date(outcome.utcDate).toLocaleDateString()}</span>
+                      <span>{new Date(match.date).toLocaleDateString()}</span>
                     </div>
                   </div>
 
-                  <div className={`home-outcome-badge ${outcome.actualResult === outcome.prediction ? 'correct' : 'incorrect'}`}>
-                    {outcome.actualResult === outcome.prediction ? '✅ Correct' : '❌ Incorrect'}
-                  </div>
+                  {match.isVIP && (
+                    <div className="home-vip-badge">
+                      <Crown className="home-vip-icon" />
+                      <span>VIP</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="home-match-info">
                   <h3 className="home-match-teams">
-                    {outcome.homeTeam.name} vs {outcome.awayTeam.name}
+                    {match.homeTeam} vs {match.awayTeam}
                   </h3>
-                  <p className="home-match-league">{outcome.competition?.name || 'Premier League'}</p>
+                  <p className="home-match-league">{match.league}</p>
                 </div>
 
                 <div className="home-prediction-section">
                   <div className="home-prediction-display">
-                    <div className="home-prediction-label">Predicted: {outcome.prediction}</div>
-                    <div className="home-prediction-label">Actual: {outcome.actualResult}</div>
-                    <div className="home-prediction-confidence">{outcome.confidence}% Confidence</div>
+                    {/* Show the first outcome from this match */}
+                    {match.outcomes && match.outcomes.length > 0 && (() => {
+                      const outcome = match.outcomes[0]; // Show first outcome
+                      const isCorrect = outcome.actualResult === 'win';
+
+                      return (
+                        <>
+                          <div className={`home-outcome-badge ${isCorrect ? 'correct' : 'incorrect'}`}>
+                            {isCorrect ? '✅ Correct' : '❌ Incorrect'}
+                          </div>
+                          <div className="home-prediction-label">
+                            {outcome.predictionType === 'win' ? 'Match Winner' :
+                             outcome.predictionType === 'over15' ? 'Over/Under 1.5' :
+                             outcome.predictionType === 'over25' ? 'Over/Under 2.5' :
+                             outcome.predictionType === 'over35' ? 'Over/Under 3.5' :
+                             outcome.predictionType === 'corners' ? 'Corners' :
+                             outcome.predictionType === 'ggng' ? 'GG/NG' :
+                             outcome.predictionType === 'others' ? 'Others' :
+                             'Prediction'}: {outcome.prediction}
+                          </div>
+                          {match.outcomes.length > 1 && (
+                            <div className="home-prediction-label">
+                              +{match.outcomes.length - 1} more outcome{match.outcomes.length > 2 ? 's' : ''}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>

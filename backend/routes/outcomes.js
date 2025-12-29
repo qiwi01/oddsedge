@@ -32,21 +32,22 @@ router.get('/', authenticateToken, async (req, res) => {
       query.date = { $gte: thirtyDaysAgo };
     }
 
-    // VIP filtering - non-VIP users can't see VIP outcomes
-    if (!user.isVIP) {
-      query.isVIP = { $ne: true };
-    }
+    // VIP games are shown for everyone in outcomes, but marked as VIP
 
     const matches = await Match.find(query)
       .populate('outcomes.outcomeSetBy', 'username')
       .sort({ date: -1 })
       .select('homeTeam awayTeam date league predictions outcomes isVIP homeGoals awayGoals');
 
+    // Filter to only show matches that have at least one completed outcome (not pending)
+    let filteredMatches = matches.filter(match =>
+      match.outcomes && match.outcomes.some(outcome => outcome.actualResult !== 'pending')
+    );
+
     // Filter by prediction type if specified
-    let filteredMatches = matches;
     if (type && type !== 'all') {
-      filteredMatches = matches.filter(match =>
-        match.outcomes && match.outcomes.some(outcome => outcome.predictionType === type)
+      filteredMatches = filteredMatches.filter(match =>
+        match.outcomes && match.outcomes.some(outcome => outcome.predictionType === type && outcome.actualResult !== 'pending')
       );
     }
 
@@ -195,19 +196,29 @@ router.put('/:matchId/outcomes', authenticateToken, requireAdmin, async (req, re
 // Get available dates for navigation
 router.get('/dates', authenticateToken, async (req, res) => {
   try {
-    const user = await require('../models/User').findById(req.user.id);
+    // Only include dates for matches that have completed outcomes
+    const matches = await Match.find({
+      outcomes: {
+        $exists: true,
+        $ne: [],
+        $elemMatch: { actualResult: { $ne: 'pending' } }
+      }
+    })
+    .select('date')
+    .sort({ date: -1 })
+    .limit(100); // Get more matches to ensure we have enough unique dates
 
-    let query = {};
-    if (!user.isVIP) {
-      query.isVIP = { $ne: true };
-    }
+    // Extract unique dates
+    const dateSet = new Set();
+    matches.forEach(match => {
+      const dateStr = match.date.toISOString().split('T')[0];
+      dateSet.add(dateStr);
+    });
 
-    const dates = await Match.find(query)
-      .distinct('date')
-      .sort({ date: -1 })
-      .limit(30); // Last 30 days
+    // Convert to array and sort
+    const uniqueDates = Array.from(dateSet).sort().reverse().slice(0, 30);
 
-    res.json(dates.map(date => date.toISOString().split('T')[0]));
+    res.json(uniqueDates);
   } catch (error) {
     console.error('Error fetching dates:', error);
     res.status(500).json({ error: 'Failed to fetch dates' });

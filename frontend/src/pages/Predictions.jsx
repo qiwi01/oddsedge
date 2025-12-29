@@ -22,12 +22,18 @@ const Predictions = () => {
       if (path.includes('/over15')) return 'today-over15';
       if (path.includes('/over25')) return 'today-over25';
       if (path.includes('/over35')) return 'today-over35';
+      if (path.includes('/corners')) return 'today-corners';
+      if (path.includes('/ggng')) return 'today-ggng';
+      if (path.includes('/others')) return 'today-others';
       if (path.includes('/players')) return 'today-players';
     } else if (path.includes('/top-picks/')) {
       if (path.includes('/win')) return 'top-picks-win';
       if (path.includes('/over15')) return 'top-picks-over15';
       if (path.includes('/over25')) return 'top-picks-over25';
       if (path.includes('/over35')) return 'top-picks-over35';
+      if (path.includes('/corners')) return 'top-picks-corners';
+      if (path.includes('/ggng')) return 'top-picks-ggng';
+      if (path.includes('/others')) return 'top-picks-others';
       if (path.includes('/players')) return 'top-picks-players';
       return 'top-picks';
     } else if (path.includes('/vip')) {
@@ -37,6 +43,9 @@ const Predictions = () => {
       if (path.includes('/over15')) return 'all-over15';
       if (path.includes('/over25')) return 'all-over25';
       if (path.includes('/over35')) return 'all-over35';
+      if (path.includes('/corners')) return 'all-corners';
+      if (path.includes('/ggng')) return 'all-ggng';
+      if (path.includes('/others')) return 'all-others';
       if (path.includes('/players')) return 'all-players';
     }
 
@@ -49,6 +58,9 @@ const Predictions = () => {
     if (predictionType.includes('-over15')) return 'over15';
     if (predictionType.includes('-over25')) return 'over25';
     if (predictionType.includes('-over35')) return 'over35';
+    if (predictionType.includes('-corners')) return 'corners';
+    if (predictionType.includes('-ggng')) return 'ggng';
+    if (predictionType.includes('-others')) return 'others';
     if (predictionType.includes('-players')) return 'player';
     return null; // For 'all' type, show all predictions
   };
@@ -136,9 +148,26 @@ const Predictions = () => {
         matchesData = matchesData.filter(match =>
           match.predictions && match.predictions.some(pred => pred.type === 'over35')
         );
+      } else if (predictionType.includes('-corners')) {
+        matchesData = matchesData.filter(match =>
+          match.predictions && match.predictions.some(pred => pred.type === 'corners')
+        );
+      } else if (predictionType.includes('-ggng')) {
+        matchesData = matchesData.filter(match =>
+          match.predictions && match.predictions.some(pred => pred.type === 'ggng')
+        );
+      } else if (predictionType.includes('-others')) {
+        matchesData = matchesData.filter(match =>
+          match.predictions && match.predictions.some(pred => pred.type === 'others')
+        );
       } else if (predictionType.includes('-players')) {
         matchesData = matchesData.filter(match =>
           match.predictions && match.predictions.some(pred => pred.type === 'player')
+        );
+      } else if (predictionType === 'top-picks') {
+        // For top-picks, show only matches that have value bets
+        matchesData = matchesData.filter(match =>
+          match.predictions && match.predictions.some(pred => pred.valueBet === true)
         );
       }
       // For 'all' and other general pages, show all matches that have predictions
@@ -205,6 +234,21 @@ const Predictions = () => {
           title: "Today's Over/Under 3.5 Goals",
           subtitle: "Matches predicted to have 4 or more goals today"
         };
+      case 'today-corners':
+        return {
+          title: "Today's Corner Predictions",
+          subtitle: "AI predictions for corner kicks in today's matches"
+        };
+      case 'today-ggng':
+        return {
+          title: "Today's GG/NG Predictions",
+          subtitle: "Both teams to score predictions for today's matches"
+        };
+      case 'today-others':
+        return {
+          title: "Today's Other Predictions",
+          subtitle: "Additional betting market predictions for today's matches"
+        };
       case 'today-players':
         return {
           title: "Today's Player Predictions",
@@ -213,7 +257,7 @@ const Predictions = () => {
       case 'top-picks':
         return {
           title: "Top Picks",
-          subtitle: "Curated selection of our highest confidence predictions"
+          subtitle: "Matches with our highest confidence value bets"
         };
       case 'top-picks-win':
         return {
@@ -234,6 +278,21 @@ const Predictions = () => {
         return {
           title: "Top Picks - Over/Under 3.5 Goals",
           subtitle: "Our most reliable over/under 3.5 goals predictions"
+        };
+      case 'top-picks-corners':
+        return {
+          title: "Top Picks - Corner Predictions",
+          subtitle: "Our highest confidence corner kick predictions"
+        };
+      case 'top-picks-ggng':
+        return {
+          title: "Top Picks - GG/NG Predictions",
+          subtitle: "Our highest confidence both teams to score predictions"
+        };
+      case 'top-picks-others':
+        return {
+          title: "Top Picks - Other Predictions",
+          subtitle: "Our highest confidence additional betting market predictions"
         };
       case 'top-picks-players':
         return {
@@ -264,6 +323,21 @@ const Predictions = () => {
         return {
           title: "Over/Under 3.5 Goals",
           subtitle: "Matches predicted to have 4 or more goals"
+        };
+      case 'all-corners':
+        return {
+          title: "Corner Predictions",
+          subtitle: "AI predictions for corner kicks in all upcoming matches"
+        };
+      case 'all-ggng':
+        return {
+          title: "GG/NG Predictions",
+          subtitle: "Both teams to score predictions for all upcoming matches"
+        };
+      case 'all-others':
+        return {
+          title: "Other Predictions",
+          subtitle: "Additional betting market predictions for all upcoming matches"
         };
       case 'all-players':
         return {
@@ -309,6 +383,30 @@ const Predictions = () => {
           className="predictions-date-select"
           placeholder="Filter by date"
         />
+
+        {/* Prediction Type Filter - Show on "All Predictions" page and specific type pages */}
+        {(predictionType === 'all' || predictionType.includes('-win') || predictionType.includes('-over15') || predictionType.includes('-over25') || predictionType.includes('-over35') || predictionType.includes('-corners') || predictionType.includes('-ggng') || predictionType.includes('-others') || predictionType.includes('-player') || predictionType.includes('-players')) && (
+          <select
+            value={predictionTypeFilter || 'all'}
+            onChange={(e) => {
+              const newFilter = e.target.value === 'all' ? null : e.target.value;
+              // Update the URL to reflect the filter change
+              const newPath = newFilter ? `/predictions/${newFilter}` : '/predictions';
+              window.location.href = newPath;
+            }}
+            className="predictions-league-select"
+          >
+            <option value="all">All Types</option>
+            <option value="win">Win/Draw</option>
+            <option value="over15">Over 1.5</option>
+            <option value="over25">Over 2.5</option>
+            <option value="over35">Over 3.5</option>
+            <option value="corners">Corners</option>
+            <option value="ggng">GG/NG</option>
+            <option value="others">Others</option>
+            <option value="players">Players</option>
+          </select>
+        )}
       </div>
 
       {/* Matches Grid */}
@@ -362,6 +460,9 @@ const Predictions = () => {
                           {prediction.type === 'win' ? 'WIN/DRAW' :
                            prediction.type === 'over15' ? 'OVER/UNDER 1.5' :
                            prediction.type === 'over25' ? 'OVER/UNDER 2.5' :
+                           prediction.type === 'corners' ? 'CORNERS' :
+                           prediction.type === 'ggng' ? 'GG/NG' :
+                           prediction.type === 'others' ? 'OTHERS' :
                            'PLAYER'}
                         </span>
                         {prediction.valueBet && (

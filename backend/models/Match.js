@@ -39,7 +39,7 @@ const MatchSchema = new mongoose.Schema({
   predictions: [{
     type: {
       type: String,
-      enum: ['win', 'over15', 'over25', 'over35', 'player'],
+      enum: ['win', 'over15', 'over25', 'over35', 'corners', 'ggng', 'others', 'player'],
       required: true
     },
     prediction: {
@@ -81,7 +81,7 @@ const MatchSchema = new mongoose.Schema({
   outcomes: [{
     predictionType: {
       type: String,
-      enum: ['win', 'over15', 'over25', 'over35', 'player'],
+      enum: ['win', 'over15', 'over25', 'over35', 'corners', 'ggng', 'others', 'player'],
       required: true
     },
     prediction: {
